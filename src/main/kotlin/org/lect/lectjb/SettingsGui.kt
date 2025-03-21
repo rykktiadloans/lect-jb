@@ -91,10 +91,10 @@ class SettingsGuiWrapper(private val project: Project) : DialogWrapper(true) {
     var codePath: String = ""
     var language: String = ""
     var outputPath = ""
-    var direction = ""
+    var direction = "Up-to-down"
     var remove = true
     var suffix = ""
-    var shakeDirection = ""
+    var shakeDirection = "Roots"
 
     init {
         title = "Lect Settings"
@@ -160,7 +160,7 @@ class SettingsGuiWrapper(private val project: Project) : DialogWrapper(true) {
             }
             row("Language") {
                 comboBox(listOf("", "C++", "Java"))
-                    .bindItem({"C++"}, {this@SettingsGuiWrapper.language = it ?: "" })
+                    .bindItem({""}, {this@SettingsGuiWrapper.language = it ?: "" })
                     .validationOnApply {
                         if(it.selectedItem!!.toString().trim().isEmpty()) {
                             return@validationOnApply error("You have to choose a language")
@@ -188,7 +188,7 @@ class SettingsGuiWrapper(private val project: Project) : DialogWrapper(true) {
 
             row("Tree direction") {
                 comboBox(listOf("Up-to-down", "Down-to-up", "Right-to-left", "Left-to-right"))
-                    .bindItem({"Up-to-down"}, {this@SettingsGuiWrapper.direction = it ?: "" })
+                    .bindItem({this@SettingsGuiWrapper.direction}, {this@SettingsGuiWrapper.direction = it ?: "" })
                     .validationOnApply {
                         if(it.selectedItem!!.toString().trim().isEmpty()) {
                             return@validationOnApply error("You have to choose a direction")
@@ -209,7 +209,7 @@ class SettingsGuiWrapper(private val project: Project) : DialogWrapper(true) {
 
             row("Node shake direction") {
                 comboBox(listOf("Leaves", "Roots"))
-                    .bindItem({"Roots"}, {this@SettingsGuiWrapper.shakeDirection = it ?: "" })
+                    .bindItem({this@SettingsGuiWrapper.shakeDirection}, {this@SettingsGuiWrapper.shakeDirection = it ?: "" })
                     .validationOnApply {
                         if(it.selectedItem!!.toString().trim().isEmpty()) {
                             return@validationOnApply error("You have to choose a shake direction")
@@ -228,6 +228,7 @@ class SettingsGuiWrapper(private val project: Project) : DialogWrapper(true) {
         settings.state.textPath = this.textPath
         settings.state.codePath = this.codePath
         settings.state.language = this.language
+        settings.state.outputPath = this.outputPath
         settings.state.direction = this.direction
         settings.state.remove = this.remove
         settings.state.suffix = this.suffix
@@ -250,7 +251,7 @@ class SettingsGuiWrapper(private val project: Project) : DialogWrapper(true) {
             NotificationGroupManager.getInstance()
                 .getNotificationGroup("Lect Notification Group")
                 .createNotification("Lect Error",
-                    "It seems that no direction was supplied", NotificationType.ERROR)
+                    "`${this.direction}` is not a valid direction`", NotificationType.ERROR)
                 .notify(this.project)
             return
         }
