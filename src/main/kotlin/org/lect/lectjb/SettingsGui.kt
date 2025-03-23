@@ -25,6 +25,7 @@ import com.intellij.execution.ui.RunContentManager
 import com.intellij.execution.ui.RunState
 import com.intellij.execution.util.ExecUtil
 import com.intellij.icons.AllIcons
+import com.intellij.ide.BrowserUtil
 import com.intellij.ide.actions.runAnything.RunAnythingAction
 import com.intellij.ide.actions.runAnything.RunAnythingUtil
 import com.intellij.notification.*
@@ -82,9 +83,31 @@ class Settings : SimplePersistentStateComponent<Settings.State>(State()) {
         var remove by property(true)
         var suffix by string("")
         var shakeDirection by string("")
+        var index by string("")
 
     }
 }
+
+class OpenLect : AnAction() {
+    override fun actionPerformed(e: AnActionEvent) {
+        if(e.project == null) {
+            NotificationGroupManager.getInstance()
+                .getNotificationGroup("Lect Notification Group")
+                .createNotification("Lect Error", "You to open a project for this to work", NotificationType.ERROR)
+                .notify(null)
+        }
+        val index = e.project!!.getService(Settings::class.java).state.index
+        if(index!!.isEmpty()) {
+            NotificationGroupManager.getInstance()
+                .getNotificationGroup("Lect Notification Group")
+                .createNotification("Lect Error", "No Lect documentation was generated yet", NotificationType.ERROR)
+                .notify(null)
+        }
+        BrowserUtil.browse("file://$index")
+    }
+
+}
+
 class SettingsGuiWrapper(private val project: Project) : DialogWrapper(true) {
     var binaryPath: String = ""
     var textPath: String = ""
@@ -160,7 +183,7 @@ class SettingsGuiWrapper(private val project: Project) : DialogWrapper(true) {
             }
             row("Language") {
                 comboBox(listOf("", "C++", "Java"))
-                    .bindItem({""}, {this@SettingsGuiWrapper.language = it ?: "" })
+                    .bindItem({this@SettingsGuiWrapper.language}, {this@SettingsGuiWrapper.language = it ?: "" })
                     .validationOnApply {
                         if(it.selectedItem!!.toString().trim().isEmpty()) {
                             return@validationOnApply error("You have to choose a language")
@@ -277,6 +300,7 @@ class SettingsGuiWrapper(private val project: Project) : DialogWrapper(true) {
         commandLine.addParameters("-o", this.outputPath)
         commandLine.addParameters("-d", direction)
         commandLine.addParameters("-lup", shakeDirection)
+        commandLine.addParameters("-jb")
         if(this.remove) {
             commandLine.addParameter("-r")
         }
@@ -298,6 +322,9 @@ class SettingsGuiWrapper(private val project: Project) : DialogWrapper(true) {
             .createNotification("Lect Info",
                 "Lect worked successfully!", NotificationType.INFORMATION)
             .notify(this.project)
+
+        val separator = if (outputPath[outputPath.length - 1] == '/') "" else "/"
+        settings.state.index = "$outputPath$separator" + "index.html"
 
 
         super.doOKAction()
