@@ -335,7 +335,7 @@ class CmdRunState(environment: ExecutionEnvironment) : CommandLineState(environm
     private fun getRunProfile(): CmdRunProfile {
         val runProfile = environment.runProfile
         if(runProfile !is CmdRunProfile) {
-            throw IllegalStateException("Got $runProfile instead of RunAnything profile");
+            throw IllegalStateException("Got $runProfile instead of RunAnything profile")
         }
         return runProfile
     }
@@ -349,7 +349,7 @@ class CmdRunState(environment: ExecutionEnvironment) : CommandLineState(environm
 }
 
 class CmdRunProfile(val commandLine: GeneralCommandLine) : RunProfile {
-    override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? {
+    override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
         return CmdRunState(environment)
     }
 
@@ -357,7 +357,7 @@ class CmdRunProfile(val commandLine: GeneralCommandLine) : RunProfile {
         return "Lect Profile"
     }
 
-    override fun getIcon(): Icon? {
+    override fun getIcon(): Icon {
         return AllIcons.Actions.Run_anything
     }
 

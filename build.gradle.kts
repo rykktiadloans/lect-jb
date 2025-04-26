@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "org.lect"
-version = "0.1.1"
+version = "0.2.0"
 
 repositories {
     mavenCentral()
@@ -32,7 +32,7 @@ tasks {
 
     patchPluginXml {
         sinceBuild.set("231")
-        untilBuild.set("241.*")
+        untilBuild.set("251.*")
     }
 
     signPlugin {
